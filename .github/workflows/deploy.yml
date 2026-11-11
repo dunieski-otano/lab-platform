@@ -20,7 +20,9 @@ jobs:
           role-to-assume: arn:aws:iam::639916808497:role/gha-prod-deploy  # the role whose trust policy you wrote
           aws-region: us-east-1
       - run: aws sts get-caller-identity
-      - run: aws iam create-user --user-name gha-prod-deploy 
+      - run: aws iam create-user --user-name gha-prod-deploy || echo "user already exists"
+      - run: aws iam create-group --group-name developers || echo "group already exists"
+      - run: aws iam add-user-to-group --user-name gha-prod-deploy --group-name developers || echo "user already in group"
       - name: Show OIDC claims (debug, remove after)
         run: |
           RESP=$(curl -s -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
